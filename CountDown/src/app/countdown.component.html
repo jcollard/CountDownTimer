@@ -6,4 +6,7 @@
         End Time: <input type="time" [(ngModel)]="endAt"/>
         <!-- <input type="time" (ngModel)="endAt"/> -->
      </p>
+     <p>Set Countdown: <input type="number" size="2" [(ngModel)]="timeSet" style="width:40px"/> <button (click)="this.setTime(this.timeSet)">Start</button></p>
+
+     
 </div>

@@ -11,13 +11,10 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   @ViewChild('timer') el!: ElementRef;
   private outputArea!: HTMLDivElement;
   public endAt: string = "12:00";
+  public timeSet: number = 5;
 
   ngOnInit(): void {
-
-    console.log(this.endAt);
-    const currentDate = new Date();
-    currentDate.setTime(currentDate.getTime() + (60*59*1000));
-    this.endAt = `${currentDate.getHours()}:${currentDate.getMinutes()}`;
+    this.setTime(60);
     setInterval(() => this.timeLeft(), 250);
   }
 
@@ -27,27 +24,37 @@ export class CountDownComponent implements OnInit, AfterViewInit {
 
   private timeLeft(): void {
     const endAt = this.parseTime();
-    const currentTime = new Date();
-    const endTime = new Date();
-    endTime.setHours(endAt.hours);
-    endTime.setMinutes(endAt.minutes);
-    endTime.setSeconds(0);
-    const remainingMillis = endTime.getTime() - (new Date().getTime());
-    if(remainingMillis <= 0){
+    const remainingMillis = endAt.getTime() - (new Date().getTime());
+    if (remainingMillis <= 0) {
       this.outputArea.innerHTML = "Times Up!";
       return;
     }
-    const seconds = Math.round(remainingMillis/1000);
-    const minutesRemaining = Math.round(seconds/60);
+    const seconds = Math.round(remainingMillis / 1000);
+    const minutesRemaining = Math.floor(seconds / 60);
     const secondsRemaining = seconds % 60;
-    const secondsString = secondsRemaining < 10 ? '0' + secondsRemaining : secondsRemaining;
+    const secondsString = `${secondsRemaining}`.padStart(2, '0');
     this.outputArea.innerHTML = `${minutesRemaining}:${secondsString}`;
   }
 
-  private parseTime(): Time {
+  private parseTime(): Date {
+    const d: Date = new Date();
+    const splits: string[] = this.endAt.split(":");
     const hours: number = Number.parseInt(this.endAt.split(":")[0]);
     const minutes: number = Number.parseInt(this.endAt.split(":")[1]);
-    return { hours: hours, minutes: minutes };
+    const seconds: number = splits.length > 2 ? Number.parseInt(this.endAt.split(":")[2]) : 0;
+    d.setHours(hours);
+    d.setMinutes(minutes);
+    d.setSeconds(seconds);
+    return d;
+  }
+
+  public setTime(minutes: number): void {
+    const targetTime: Date = new Date();
+    targetTime.setTime(new Date().getTime() + minutes * 60 * 1000);
+    const hours: string = `${targetTime.getHours()}`.padStart(2, '0');
+    const mins: string = `${targetTime.getMinutes()}`.padStart(2, '0');
+    const seconds: string = `${targetTime.getSeconds()}`.padStart(2, '0');
+    this.endAt = `${hours}:${mins}:${seconds}`;
   }
 
 }
