@@ -15,9 +15,9 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
 
     console.log(this.endAt);
-    const currentDate = new Date("+1hour");
-
-    this.endAt = `${currentDate.getHours()+1}:00`;
+    const currentDate = new Date();
+    currentDate.setTime(currentDate.getTime() + (60*59*1000));
+    this.endAt = `${currentDate.getHours()}:${currentDate.getMinutes()}`;
     setInterval(() => this.timeLeft(), 250);
   }
 
