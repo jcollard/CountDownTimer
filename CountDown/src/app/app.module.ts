@@ -1,16 +1,18 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
 
-import { AppComponent } from './app.component';
+import { CountDownComponent } from './countdown.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    CountDownComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    FormsModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [CountDownComponent]
 })
 export class AppModule { }
