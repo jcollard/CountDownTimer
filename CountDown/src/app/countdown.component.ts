@@ -1,6 +1,22 @@
 import { Time } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
+type TimeDictionary = {
+  'Monday': Array<[string, Time] | undefined>,
+  'Tuesday': Array<[string, Time] | undefined>,
+  'Wednesday': Array<[string, Time] | undefined>,
+  'Thursday': Array<[string, Time] | undefined>,
+  'Friday': Array<[string, Time] | undefined>,
+} 
+
+function time(hours: number, minutes: number): Time {
+  return {hours: hours, minutes: minutes};
+}
+
+function entry(label: string, hours: number, minutes: number): [string, Time] {
+  return [label, {hours: hours, minutes: minutes}]
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './countdown.component.html',
@@ -15,11 +31,21 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   private outputArea!: HTMLDivElement;
   private playSound: boolean = false;
 
+  private bestTimes!: TimeDictionary;
+
+
   public soundEnabled: boolean = false;
   public endAt: string = "12:00";
   public timeSet: number = 5;
 
   ngOnInit(): void {
+    this.bestTimes = {
+      'Monday':     [ entry('A',  8, 35), entry('B',  9, 25), entry('C', 10, 15), entry('D', 11, 30), entry('E', 12, 20), entry("WOM", 13, 40), entry('8th',  15, 35) ],
+      'Tuesday':    [ entry('D',  9, 10), entry('E', 10, 35), entry('F', 12, 20), undefined,          undefined,          entry("WOM", 14, 40), entry('8th',  15, 35) ],
+      'Wednesday':  [ entry('B', 10, 10), entry('A', 11, 35), entry('C', 13, 10), undefined,          undefined,          entry("7th", 14, 40), entry('Club', 15, 35) ],
+      'Thursday':   [ entry('F',  9, 10), entry('D', 10, 35), entry('E', 12, 20), undefined,          undefined,          undefined,            entry('8th',  15, 35) ],
+      'Friday':     [ entry('C',  9, 10), entry('B', 10, 35), entry('A', 13, 10), undefined,          undefined,          undefined,            undefined             ]
+    }
     this.setTime(60, true);
     setInterval(() => this.timeLeft(), 250);
   }
