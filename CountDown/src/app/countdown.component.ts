@@ -9,7 +9,13 @@ import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angula
 export class CountDownComponent implements OnInit, AfterViewInit {
   title = 'CountDown';
   @ViewChild('timer') el!: ElementRef;
+  @ViewChild('audioPlayer') audioPlayerEl!: ElementRef;
+
+  private audioPlayer!: HTMLAudioElement;
   private outputArea!: HTMLDivElement;
+  private playSound: boolean = false;
+
+  public soundEnabled: boolean = false;
   public endAt: string = "12:00";
   public timeSet: number = 5;
 
@@ -20,6 +26,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.outputArea = this.el.nativeElement;
+    this.audioPlayer = this.audioPlayerEl.nativeElement;
   }
 
   private timeLeft(): void {
@@ -27,12 +34,18 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     const remainingMillis = endAt.getTime() - (new Date().getTime());
     if (remainingMillis <= 0) {
       this.outputArea.innerHTML = "Times Up!";
+      if (this.playSound && this.soundEnabled) {
+        this.audioPlayer.play();
+      }
+
+      this.playSound = false;
       return;
     }
     const seconds = Math.round(remainingMillis / 1000);
     const mins = "" + Math.floor(seconds / 60);
     const secs = "" + (seconds % 60);
     this.outputArea.innerHTML = `${mins.padStart(2,'0')}:${secs.padStart(2,'0')}`;
+    this.playSound = true;
   }
 
   private parseTime(): Date {

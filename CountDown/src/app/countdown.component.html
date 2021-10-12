@@ -1,13 +1,22 @@
 <div #timer class="timer">
 
 </div>
+<audio #audioPlayer>
+    <source src="../assets/no.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+  </audio>
 <div style="text-align: center;">
     <p>
         End Time: <input type="time" [(ngModel)]="endAt" />
         <!-- <input type="time" (ngModel)="endAt"/> -->
     </p>
-    <p>Set Countdown: <input type="number" size="2" [(ngModel)]="timeSet" style="width:40px" /> <button
-            (click)="this.setTime(this.timeSet)">Start</button></p>
+    <p>
+        Set Countdown: <input type="number" size="2" [(ngModel)]="timeSet" style="width:40px" />
+        <button (click)="this.setTime(this.timeSet)">Start</button>
+    </p>
+    <p>
+        <input type="checkbox" [(ngModel)]="soundEnabled"/> Play Sound
+    </p>
 
     <table class="calendar">
         <th>Mon</th>
@@ -79,8 +88,6 @@
             <td><button (click)="this.setTimeT(15,35)">8th</button></td>
             <td><button>--</button></td>
         </tr>
-
-            
 
     </table>
 </div>
