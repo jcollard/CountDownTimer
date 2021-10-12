@@ -30,10 +30,9 @@ export class CountDownComponent implements OnInit, AfterViewInit {
       return;
     }
     const seconds = Math.round(remainingMillis / 1000);
-    const minutesRemaining = Math.floor(seconds / 60);
-    const secondsRemaining = seconds % 60;
-    const secondsString = `${secondsRemaining}`.padStart(2, '0');
-    this.outputArea.innerHTML = `${minutesRemaining}:${secondsString}`;
+    const mins = "" + Math.floor(seconds / 60);
+    const secs = "" + (seconds % 60);
+    this.outputArea.innerHTML = `${mins.padStart(2,'0')}:${secs.padStart(2,'0')}`;
   }
 
   private parseTime(): Date {
