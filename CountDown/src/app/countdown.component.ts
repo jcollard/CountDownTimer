@@ -51,10 +51,22 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   public setTime(minutes: number): void {
     const targetTime: Date = new Date();
     targetTime.setTime(new Date().getTime() + minutes * 60 * 1000);
-    const hours: string = `${targetTime.getHours()}`.padStart(2, '0');
-    const mins: string = `${targetTime.getMinutes()}`.padStart(2, '0');
-    const seconds: string = `${targetTime.getSeconds()}`.padStart(2, '0');
-    this.endAt = `${hours}:${mins}:${seconds}`;
+    this.endAt = this.dateToString(targetTime);
+  }
+
+  private dateToString(d: Date): string {
+    const hours: string = `${d.getHours()}`.padStart(2, '0');
+    const mins: string = `${d.getMinutes()}`.padStart(2, '0');
+    const seconds: string = `${d.getSeconds()}`.padStart(2, '0');
+    return `${hours}:${mins}:${seconds}`;
+  }
+
+  public setTimeT(hour: number, minutes: number): void {
+    const targetTime: Date = new Date();
+    targetTime.setHours(hour);
+    targetTime.setMinutes(minutes);
+    targetTime.setSeconds(0);
+    this.endAt = this.dateToString(targetTime);
   }
 
 }

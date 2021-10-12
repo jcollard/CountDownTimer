@@ -3,10 +3,84 @@
 </div>
 <div style="text-align: center;">
     <p>
-        End Time: <input type="time" [(ngModel)]="endAt"/>
+        End Time: <input type="time" [(ngModel)]="endAt" />
         <!-- <input type="time" (ngModel)="endAt"/> -->
-     </p>
-     <p>Set Countdown: <input type="number" size="2" [(ngModel)]="timeSet" style="width:40px"/> <button (click)="this.setTime(this.timeSet)">Start</button></p>
+    </p>
+    <p>Set Countdown: <input type="number" size="2" [(ngModel)]="timeSet" style="width:40px" /> <button
+            (click)="this.setTime(this.timeSet)">Start</button></p>
 
-     
+    <table class="calendar">
+        <th>Mon</th>
+        <th>Tues</th>
+        <th>Wed</th>
+        <th>Thurs</th>
+        <th>Fri</th>
+
+        <tr>
+            <td><button (click)="this.setTimeT(8,35)">A</button></td>
+            <td><button>D</button></td>
+            <td><button>B</button></td>
+            <td><button>F</button></td>
+            <td><button>C</button></td>
+        </tr>
+
+        <tr>
+            <td><button>B</button></td>
+            <td><button>E</button></td>
+            <td><button>A</button></td>
+            <td><button>D</button></td>
+            <td><button>B</button></td>
+        </tr>
+
+        <tr>
+            <td><button>C</button></td>
+            <td><button>F</button></td>
+            <td><button>C</button></td>
+            <td><button>E</button></td>
+            <td><button>A</button></td>
+        </tr>
+
+        <tr>
+            <td><button>D</button></td>
+            <td><button>--</button></td>
+            <td><button>--</button></td>
+            <td><button>--</button></td>
+            <td><button>--</button></td>
+        </tr>
+
+        <tr>
+            <td><button>E</button></td>
+            <td><button>--</button></td>
+            <td><button>--</button></td>
+            <td><button>--</button></td>
+            <td><button>--</button></td>
+        </tr>
+
+        <tr>
+            <td><button>F</button></td>
+            <td><button>--</button></td>
+            <td><button>--</button></td>
+            <td><button>--</button></td>
+            <td><button>--</button></td>
+        </tr>
+
+        <tr>
+            <td><button>WOM</button></td>
+            <td><button>WOM</button></td>
+            <td><button>Club</button></td>
+            <td><button>--</button></td>
+            <td><button>--</button></td>
+        </tr>
+
+        <tr>
+            <td><button>8th</button></td>
+            <td><button>8th</button></td>
+            <td><button>8th</button></td>
+            <td><button>8th</button></td>
+            <td><button>--</button></td>
+        </tr>
+
+            
+
+    </table>
 </div>
