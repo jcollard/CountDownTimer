@@ -14,7 +14,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   public timeSet: number = 5;
 
   ngOnInit(): void {
-    this.setTime(60);
+    this.setTime(60, true);
     setInterval(() => this.timeLeft(), 250);
   }
 
@@ -48,9 +48,12 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     return d;
   }
 
-  public setTime(minutes: number): void {
+  public setTime(minutes: number, seconds?:boolean): void {
     const targetTime: Date = new Date();
     targetTime.setTime(new Date().getTime() + minutes * 60 * 1000);
+    if(seconds){
+      targetTime.setSeconds(0);
+    }
     this.endAt = this.dateToString(targetTime);
   }
 
