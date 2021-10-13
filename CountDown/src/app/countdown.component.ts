@@ -1,12 +1,12 @@
 import { Time } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
-interface Entry {
-  getDisplay(): string;
-  setTime(cdc: CountDownComponent): void;
+interface QuickButton {
+  getDisplayText(): string;
+  click(cdc: CountDownComponent): void;
 }
 
-class TimeEntry implements Entry {
+class TimeButton implements QuickButton {
   public label: string;
   public time: Time
 
@@ -15,32 +15,30 @@ class TimeEntry implements Entry {
     this.time = { hours: hours, minutes: minutes };
   }
 
-  public getDisplay(): string {
+  public getDisplayText(): string {
     return this.label;
   }
 
-  public setTime(cdc: CountDownComponent): void {
-    cdc.setTimeT(this.time.hours, this.time.minutes);
+  public click(cdc: CountDownComponent): void {
+    cdc.setTime(this.time.hours, this.time.minutes);
   }
 }
 
-class NoEntry implements Entry {
-  public getDisplay() {
+class IgnoredButton implements QuickButton {
+  public getDisplayText() {
     return '--';
   }
 
-  public setTime(cdc: CountDownComponent): void {
+  public click(cdc: CountDownComponent): void {
 
   }
 }
 
-type TimeDictionaryEntry = Array<Entry>
-
-function entry(label?: string, hours?: number, minutes?: number): Entry {
+function entry(label?: string, hours?: number, minutes?: number): QuickButton {
   if (label && hours && minutes) {
-    return new TimeEntry(label, hours, minutes);
+    return new TimeButton(label, hours, minutes);
   } else {
-    return new NoEntry();
+    return new IgnoredButton();
   }
 }
 
@@ -60,7 +58,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   private dayNumToString: Array<string> = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   public days: Array<string> = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  public bestTimes!: Record<string, TimeDictionaryEntry>;
+  public bestTimes!: Record<string, Array<QuickButton>>;
   public soundEnabled: boolean = false;
   public endAt: string = "12:00";
   public timeSet: number = 5;
@@ -118,7 +116,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
       ]
     }
 
-    this.setTime(60, true);
+    this.setTimeFromNow(60, true);
     this.findAndSetBestTime();
 
     setInterval(() => this.timeLeft(), 250);
@@ -136,15 +134,15 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   private findAndSetBestTime(): void {
     const currentDate: Date = new Date();
     const currentDay: string = this.dayNumToString[currentDate.getDay()];
-    const bestTimesToday: TimeDictionaryEntry = this.bestTimes[currentDay];
+    const bestTimesToday: Array<QuickButton> = this.bestTimes[currentDay];
 
     for (const entry of bestTimesToday) {
-      if (entry instanceof TimeEntry) {
+      if (entry instanceof TimeButton) {
         const dateCheck = new Date();
         dateCheck.setHours(entry.time.hours);
         dateCheck.setMinutes(entry.time.minutes);
         if (dateCheck > currentDate) {
-          this.setTimeT(entry.time.hours, entry.time.minutes);
+          entry.click(this);
           break;
         }
       }
@@ -164,9 +162,9 @@ export class CountDownComponent implements OnInit, AfterViewInit {
       return;
     }
     const seconds = Math.round(remainingMillis / 1000);
-    const mins = "" + Math.floor(seconds / 60);
-    const secs = "" + (seconds % 60);
-    this.outputArea.innerHTML = `${mins.padStart(2, '0')}:${secs.padStart(2, '0')}`;
+    const mins = `${Math.floor(seconds / 60)}`.padStart(2, '0');
+    const secs = `${seconds % 60}`.padStart(2, '0');
+    this.outputArea.innerHTML = `${mins}:${secs}`;
     this.playSound = true;
   }
 
@@ -182,7 +180,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     return d;
   }
 
-  public setTime(minutes: number, seconds?: boolean): void {
+  public setTimeFromNow(minutes: number, seconds?: boolean): void {
     const targetTime: Date = new Date();
     targetTime.setTime(new Date().getTime() + minutes * 60 * 1000);
     if (seconds) {
@@ -198,7 +196,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     return `${hours}:${mins}:${seconds}`;
   }
 
-  public setTimeT(hour: number, minutes: number): void {
+  public setTime(hour: number, minutes: number): void {
     const targetTime: Date = new Date();
     targetTime.setHours(hour);
     targetTime.setMinutes(minutes);
