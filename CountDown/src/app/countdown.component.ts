@@ -1,22 +1,47 @@
 import { Time } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
-// type TimeDictionary = {
-//   'Monday': Array<[string, Time] | undefined>,
-//   'Tuesday': Array<[string, Time] | undefined>,
-//   'Wednesday': Array<[string, Time] | undefined>,
-//   'Thursday': Array<[string, Time] | undefined>,
-//   'Friday': Array<[string, Time] | undefined>,
-// } 
-
-type TimeDictionaryEntry = Array<[string, Time] | '--'>
-
-function time(hours: number, minutes: number): Time {
-  return {hours: hours, minutes: minutes};
+interface Entry {
+  getDisplay(): string;
+  setTime(cdc: CountDownComponent): void;
 }
 
-function entry(label: string, hours: number, minutes: number): [string, Time] {
-  return [label, {hours: hours, minutes: minutes}]
+class TimeEntry implements Entry {
+  public label: string;
+  public time: Time
+
+  constructor(label: string, hours: number, minutes: number) {
+    this.label = label;
+    this.time = { hours: hours, minutes: minutes };
+  }
+
+  public getDisplay(): string {
+    return this.label;
+  }
+
+  public setTime(cdc: CountDownComponent): void {
+    cdc.setTimeT(this.time.hours, this.time.minutes);
+  }
+}
+
+class NoEntry implements Entry {
+  public getDisplay() {
+    return '--';
+  }
+
+  public setTime(cdc: CountDownComponent): void {
+
+  }
+}
+
+type TimeDictionaryEntry = Array<Entry>
+
+function entry(label?: string, hours?: number, minutes?: number): Entry {
+  if (label && hours && minutes) {
+    return new TimeEntry(label, hours, minutes);
+  } else {
+    return new NoEntry();
+  }
 }
 
 @Component({
@@ -42,16 +67,60 @@ export class CountDownComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.bestTimes = {
-      'Monday':     [ entry('A',  8, 35), entry('B',  9, 25), entry('C', 10, 15), entry('D', 11, 30), entry('E', 12, 20), entry("WOM", 13, 40), entry('8th',  15, 35) ],
-      'Tuesday':    [ entry('D',  9, 10), entry('E', 10, 35), entry('F', 12, 20), '--',          '--',          entry("WOM", 14, 40), entry('8th',  15, 35) ],
-      'Wednesday':  [ entry('B', 10, 10), entry('A', 11, 35), entry('C', 13, 10), '--',          '--',          entry("7th", 14, 40), entry('Club', 15, 35) ],
-      'Thursday':   [ entry('F',  9, 10), entry('D', 10, 35), entry('E', 12, 20), '--',          '--',          '--',            entry('8th',  15, 35) ],
-      'Friday':     [ entry('C',  9, 10), entry('B', 10, 35), entry('A', 13, 10), '--',          '--',          '--',            '--'             ]
+      'Monday': [
+        entry('A', 8, 35),
+        entry('B', 9, 25),
+        entry('C', 10, 15),
+        entry('D', 11, 30),
+        entry('E', 12, 20),
+        entry("WOM", 13, 40),
+        entry('8th', 15, 35)
+      ],
+
+      'Tuesday': [
+        entry('D', 9, 10),
+        entry('E', 10, 35),
+        entry('F', 12, 20),
+        entry(),
+        entry(),
+        entry("WOM", 14, 40),
+        entry('8th', 15, 35)
+      ],
+
+      'Wednesday': [
+        entry('B', 10, 10),
+        entry('A', 11, 35),
+        entry('C', 13, 10),
+        entry(),
+        entry(),
+        entry("7th", 14, 40),
+        entry('Club', 15, 35)
+      ],
+
+      'Thursday': [
+        entry('F', 9, 10),
+        entry('D', 10, 35),
+        entry('E', 12, 20),
+        entry(),
+        entry(),
+        entry(),
+        entry('8th', 15, 35)
+      ],
+
+      'Friday': [
+        entry('C', 9, 10),
+        entry('B', 10, 35),
+        entry('A', 13, 10),
+        entry(),
+        entry(),
+        entry(),
+        entry()
+      ]
     }
-    
+
     this.setTime(60, true);
     this.findAndSetBestTime();
-    
+
     setInterval(() => this.timeLeft(), 250);
   }
 
@@ -68,16 +137,14 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     const currentDate: Date = new Date();
     const currentDay: string = this.dayNumToString[currentDate.getDay()];
     const bestTimesToday: TimeDictionaryEntry = this.bestTimes[currentDay];
-    
-    for (const entry of bestTimesToday){
-      if(entry !== '--'){
-        const hours = entry[1].hours;
-        const minutes = entry[1].minutes;
+
+    for (const entry of bestTimesToday) {
+      if (entry instanceof TimeEntry) {
         const dateCheck = new Date();
-        dateCheck.setHours(hours);
-        dateCheck.setMinutes(minutes);
-        if(dateCheck > currentDate) {
-          this.setTimeT(hours, minutes);
+        dateCheck.setHours(entry.time.hours);
+        dateCheck.setMinutes(entry.time.minutes);
+        if (dateCheck > currentDate) {
+          this.setTimeT(entry.time.hours, entry.time.minutes);
           break;
         }
       }
@@ -99,7 +166,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     const seconds = Math.round(remainingMillis / 1000);
     const mins = "" + Math.floor(seconds / 60);
     const secs = "" + (seconds % 60);
-    this.outputArea.innerHTML = `${mins.padStart(2,'0')}:${secs.padStart(2,'0')}`;
+    this.outputArea.innerHTML = `${mins.padStart(2, '0')}:${secs.padStart(2, '0')}`;
     this.playSound = true;
   }
 
@@ -115,10 +182,10 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     return d;
   }
 
-  public setTime(minutes: number, seconds?:boolean): void {
+  public setTime(minutes: number, seconds?: boolean): void {
     const targetTime: Date = new Date();
     targetTime.setTime(new Date().getTime() + minutes * 60 * 1000);
-    if(seconds){
+    if (seconds) {
       targetTime.setSeconds(0);
     }
     this.endAt = this.dateToString(targetTime);
@@ -137,20 +204,6 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     targetTime.setMinutes(minutes);
     targetTime.setSeconds(0);
     this.endAt = this.dateToString(targetTime);
-  }
-
-  public setTheTime(time: [string, Time] | '--'): void {
-    if(time !== '--'){
-      this.setTimeT(time[1].hours, time[1].minutes);
-    }
-  }
-
-  public getButtonDisplay(time: [string, Time] | '--'){
-    if(time === '--'){
-      return '--';
-    } else {
-      return time[0];
-    }
   }
 
 }
