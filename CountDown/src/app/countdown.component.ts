@@ -1,13 +1,15 @@
 import { Time } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
-type TimeDictionary = {
-  'Monday': Array<[string, Time] | undefined>,
-  'Tuesday': Array<[string, Time] | undefined>,
-  'Wednesday': Array<[string, Time] | undefined>,
-  'Thursday': Array<[string, Time] | undefined>,
-  'Friday': Array<[string, Time] | undefined>,
-} 
+// type TimeDictionary = {
+//   'Monday': Array<[string, Time] | undefined>,
+//   'Tuesday': Array<[string, Time] | undefined>,
+//   'Wednesday': Array<[string, Time] | undefined>,
+//   'Thursday': Array<[string, Time] | undefined>,
+//   'Friday': Array<[string, Time] | undefined>,
+// } 
+
+type TimeDictionaryEntry = Array<[string, Time] | undefined>
 
 function time(hours: number, minutes: number): Time {
   return {hours: hours, minutes: minutes};
@@ -31,8 +33,8 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   private outputArea!: HTMLDivElement;
   private playSound: boolean = false;
 
-  private bestTimes!: TimeDictionary;
-
+  private bestTimes!: Record<string, TimeDictionaryEntry>;
+  private dayNumToString: Array<string> = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   public soundEnabled: boolean = false;
   public endAt: string = "12:00";
@@ -46,13 +48,40 @@ export class CountDownComponent implements OnInit, AfterViewInit {
       'Thursday':   [ entry('F',  9, 10), entry('D', 10, 35), entry('E', 12, 20), undefined,          undefined,          undefined,            entry('8th',  15, 35) ],
       'Friday':     [ entry('C',  9, 10), entry('B', 10, 35), entry('A', 13, 10), undefined,          undefined,          undefined,            undefined             ]
     }
+    
     this.setTime(60, true);
+    this.findAndSetBestTime();
+    
     setInterval(() => this.timeLeft(), 250);
   }
 
   ngAfterViewInit(): void {
     this.outputArea = this.el.nativeElement;
     this.audioPlayer = this.audioPlayerEl.nativeElement;
+  }
+
+  /**
+   * Attempts to find the best time for the countdown timer to 
+   * start based on the current date and time.
+   */
+  private findAndSetBestTime(): void {
+    const currentDate: Date = new Date();
+    const currentDay: string = this.dayNumToString[currentDate.getDay()];
+    const bestTimesToday: TimeDictionaryEntry = this.bestTimes[currentDay];
+    
+    for (const entry of bestTimesToday){
+      if(entry){
+        const hours = entry[1].hours;
+        const minutes = entry[1].minutes;
+        const dateCheck = new Date();
+        dateCheck.setHours(hours);
+        dateCheck.setMinutes(minutes);
+        if(dateCheck > currentDate) {
+          this.setTimeT(hours, minutes);
+          break;
+        }
+      }
+    }
   }
 
   private timeLeft(): void {
