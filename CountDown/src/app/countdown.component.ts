@@ -9,7 +9,7 @@ import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angula
 //   'Friday': Array<[string, Time] | undefined>,
 // } 
 
-type TimeDictionaryEntry = Array<[string, Time] | undefined>
+type TimeDictionaryEntry = Array<[string, Time] | '--'>
 
 function time(hours: number, minutes: number): Time {
   return {hours: hours, minutes: minutes};
@@ -32,10 +32,10 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   private audioPlayer!: HTMLAudioElement;
   private outputArea!: HTMLDivElement;
   private playSound: boolean = false;
-
-  private bestTimes!: Record<string, TimeDictionaryEntry>;
   private dayNumToString: Array<string> = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+  public days: Array<string> = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  public bestTimes!: Record<string, TimeDictionaryEntry>;
   public soundEnabled: boolean = false;
   public endAt: string = "12:00";
   public timeSet: number = 5;
@@ -43,10 +43,10 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.bestTimes = {
       'Monday':     [ entry('A',  8, 35), entry('B',  9, 25), entry('C', 10, 15), entry('D', 11, 30), entry('E', 12, 20), entry("WOM", 13, 40), entry('8th',  15, 35) ],
-      'Tuesday':    [ entry('D',  9, 10), entry('E', 10, 35), entry('F', 12, 20), undefined,          undefined,          entry("WOM", 14, 40), entry('8th',  15, 35) ],
-      'Wednesday':  [ entry('B', 10, 10), entry('A', 11, 35), entry('C', 13, 10), undefined,          undefined,          entry("7th", 14, 40), entry('Club', 15, 35) ],
-      'Thursday':   [ entry('F',  9, 10), entry('D', 10, 35), entry('E', 12, 20), undefined,          undefined,          undefined,            entry('8th',  15, 35) ],
-      'Friday':     [ entry('C',  9, 10), entry('B', 10, 35), entry('A', 13, 10), undefined,          undefined,          undefined,            undefined             ]
+      'Tuesday':    [ entry('D',  9, 10), entry('E', 10, 35), entry('F', 12, 20), '--',          '--',          entry("WOM", 14, 40), entry('8th',  15, 35) ],
+      'Wednesday':  [ entry('B', 10, 10), entry('A', 11, 35), entry('C', 13, 10), '--',          '--',          entry("7th", 14, 40), entry('Club', 15, 35) ],
+      'Thursday':   [ entry('F',  9, 10), entry('D', 10, 35), entry('E', 12, 20), '--',          '--',          '--',            entry('8th',  15, 35) ],
+      'Friday':     [ entry('C',  9, 10), entry('B', 10, 35), entry('A', 13, 10), '--',          '--',          '--',            '--'             ]
     }
     
     this.setTime(60, true);
@@ -70,7 +70,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     const bestTimesToday: TimeDictionaryEntry = this.bestTimes[currentDay];
     
     for (const entry of bestTimesToday){
-      if(entry){
+      if(entry !== '--'){
         const hours = entry[1].hours;
         const minutes = entry[1].minutes;
         const dateCheck = new Date();
@@ -137,6 +137,20 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     targetTime.setMinutes(minutes);
     targetTime.setSeconds(0);
     this.endAt = this.dateToString(targetTime);
+  }
+
+  public setTheTime(time: [string, Time] | '--'): void {
+    if(time !== '--'){
+      this.setTimeT(time[1].hours, time[1].minutes);
+    }
+  }
+
+  public getButtonDisplay(time: [string, Time] | '--'){
+    if(time === '--'){
+      return '--';
+    } else {
+      return time[0];
+    }
   }
 
 }
