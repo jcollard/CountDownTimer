@@ -42,6 +42,25 @@ function entry(label?: string, hours?: number, minutes?: number): QuickButton {
   }
 }
 
+function parseTime(timeString: string): Date {
+  const splits: string[] = timeString.split(":");
+  const hours: number = Number.parseInt(splits[0]);
+  const minutes: number = Number.parseInt(splits[1]);
+  const seconds: number = splits.length > 2 ? Number.parseInt(splits[2]) : 0;
+  const d: Date = new Date();
+  d.setHours(hours);
+  d.setMinutes(minutes);
+  d.setSeconds(seconds);
+  return d;
+}
+
+function dateToString(d: Date): string {
+  const hours: string = `${d.getHours()}`.padStart(2, '0');
+  const mins: string = `${d.getMinutes()}`.padStart(2, '0');
+  const seconds: string = `${d.getSeconds()}`.padStart(2, '0');
+  return `${hours}:${mins}:${seconds}`;
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './countdown.component.html',
@@ -57,13 +76,13 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   private playSound: boolean = false;
   private dayNumToString: Array<string> = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-  public days: Array<string> = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  public bestTimes!: Record<string, Array<QuickButton>>;
+  public readonly days: Array<string>;
+  public readonly bestTimes: Record<string, Array<QuickButton>>;
   public soundEnabled: boolean = false;
   public endAt: string = "12:00";
   public timeSet: number = 5;
 
-  ngOnInit(): void {
+  constructor() {
     this.bestTimes = {
       'Monday': [
         entry('A', 8, 35),
@@ -115,20 +134,22 @@ export class CountDownComponent implements OnInit, AfterViewInit {
         entry()
       ]
     }
+    this.days = Object.keys(this.bestTimes);
+  }
 
+  ngOnInit(): void {
     this.setTimeFromNow(60, true);
     this.findAndSetBestTime();
-
-    setInterval(() => this.timeLeft(), 250);
   }
 
   ngAfterViewInit(): void {
     this.outputArea = this.el.nativeElement;
     this.audioPlayer = this.audioPlayerEl.nativeElement;
+    setInterval(() => this.updateTime(), 250);
   }
 
   /**
-   * Attempts to find the best time for the countdown timer to 
+   * Attempts to find the best time for the countdown timer to
    * start based on the current date and time.
    */
   private findAndSetBestTime(): void {
@@ -139,8 +160,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     for (const entry of bestTimesToday) {
       if (entry instanceof TimeButton) {
         const dateCheck = new Date();
-        dateCheck.setHours(entry.time.hours);
-        dateCheck.setMinutes(entry.time.minutes);
+        dateCheck.setHours(entry.time.hours, entry.time.minutes);
         if (dateCheck > currentDate) {
           entry.click(this);
           break;
@@ -149,59 +169,44 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private timeLeft(): void {
-    const endAt = this.parseTime();
-    const remainingMillis = endAt.getTime() - (new Date().getTime());
-    if (remainingMillis <= 0) {
-      this.outputArea.innerHTML = "Times Up!";
-      if (this.playSound && this.soundEnabled) {
-        this.audioPlayer.play();
-      }
+  private timesUp(): void {
+    this.outputArea.innerHTML = "Times Up!";
+    document.title = "Times Up!"
+    if (this.playSound && this.soundEnabled) {
+      this.audioPlayer.play();
+    }
 
-      this.playSound = false;
+    this.playSound = false;
+  }
+
+  private updateTime(): void {
+    const remainingMillis = parseTime(this.endAt).getTime() - (new Date().getTime());
+
+    if (remainingMillis <= 0) {
+      this.timesUp();
       return;
     }
+
     const seconds = Math.round(remainingMillis / 1000);
     const mins = `${Math.floor(seconds / 60)}`.padStart(2, '0');
     const secs = `${seconds % 60}`.padStart(2, '0');
-    this.outputArea.innerHTML = `${mins}:${secs}`;
+    document.title = `${mins}:${secs}`;
+    this.outputArea.innerHTML = document.title;
     this.playSound = true;
   }
 
-  private parseTime(): Date {
-    const d: Date = new Date();
-    const splits: string[] = this.endAt.split(":");
-    const hours: number = Number.parseInt(this.endAt.split(":")[0]);
-    const minutes: number = Number.parseInt(this.endAt.split(":")[1]);
-    const seconds: number = splits.length > 2 ? Number.parseInt(this.endAt.split(":")[2]) : 0;
-    d.setHours(hours);
-    d.setMinutes(minutes);
-    d.setSeconds(seconds);
-    return d;
-  }
-
-  public setTimeFromNow(minutes: number, seconds?: boolean): void {
+  public setTimeFromNow(minutes: number, ignoreSeconds?: boolean): void {
     const targetTime: Date = new Date();
     targetTime.setTime(new Date().getTime() + minutes * 60 * 1000);
-    if (seconds) {
+    if (ignoreSeconds) {
       targetTime.setSeconds(0);
     }
-    this.endAt = this.dateToString(targetTime);
+    this.endAt = dateToString(targetTime);
   }
 
-  private dateToString(d: Date): string {
-    const hours: string = `${d.getHours()}`.padStart(2, '0');
-    const mins: string = `${d.getMinutes()}`.padStart(2, '0');
-    const seconds: string = `${d.getSeconds()}`.padStart(2, '0');
-    return `${hours}:${mins}:${seconds}`;
-  }
-
-  public setTime(hour: number, minutes: number): void {
+  public setTime(hour: number, minutes: number, seconds?: number): void {
     const targetTime: Date = new Date();
-    targetTime.setHours(hour);
-    targetTime.setMinutes(minutes);
-    targetTime.setSeconds(0);
-    this.endAt = this.dateToString(targetTime);
+    targetTime.setHours(hour, minutes, seconds ? seconds : 0);
+    this.endAt = dateToString(targetTime);
   }
-
 }

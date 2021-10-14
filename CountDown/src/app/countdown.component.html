@@ -1,5 +1,5 @@
 <div #timer class="timer">
-    00:00
+    60:00
 </div>
 <audio #audioPlayer>
     <source src="assets/no.mp3" type="audio/mpeg">
@@ -19,14 +19,10 @@
     </p>
 
     <table class="calendar">
-        <th>Mon</th>
-        <th>Tues</th>
-        <th>Wed</th>
-        <th>Thurs</th>
-        <th>Fri</th>
+        <th *ngFor="let day of this.days;">{{day}}</th>
 
         <tr *ngFor="let ix of [0,1,2,3,4,5,6];">
-            <td *ngFor="let day of this.days;  ">
+            <td *ngFor="let day of this.days;" width="20%">
                 <button (click)="this.bestTimes[day][ix].click(this)">
                     {{this.bestTimes[day][ix].getDisplayText()}}
                 </button>
