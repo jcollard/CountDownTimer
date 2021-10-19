@@ -134,7 +134,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
         entry()
       ],
 
-      '70 Mins': [
+      '75 Mins': [
         entry('1st', 9, 5 ),
         entry('2nd', 10, 25),
         entry('3rd', 12, 5),
