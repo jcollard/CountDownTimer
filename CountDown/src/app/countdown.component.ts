@@ -35,7 +35,7 @@ class IgnoredButton implements QuickButton {
 }
 
 function entry(label?: string, hours?: number, minutes?: number): QuickButton {
-  if (label && hours && minutes) {
+  if (label && hours !== undefined && minutes !== undefined) {
     return new TimeButton(label, hours, minutes);
   } else {
     return new IgnoredButton();
@@ -133,13 +133,14 @@ export class CountDownComponent implements OnInit, AfterViewInit {
         entry(),
         entry()
       ],
-      '70 Minutes': [
+
+      '70 Mins': [
         entry('1st', 9, 5 ),
         entry('2nd', 10, 25),
         entry('3rd', 12, 5),
         entry('Late 1st', 10, 5),
         entry('Late 2nd', 11, 25),
-        entry('Late 3rd', 1, 0),
+        entry('Late 3rd', 13, 0),
         entry()
 
       ]
