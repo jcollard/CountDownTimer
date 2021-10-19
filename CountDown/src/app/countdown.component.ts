@@ -132,6 +132,16 @@ export class CountDownComponent implements OnInit, AfterViewInit {
         entry(),
         entry(),
         entry()
+      ],
+      '70 Minutes': [
+        entry('1st', 9, 5 ),
+        entry('2nd', 10, 25),
+        entry('3rd', 12, 5),
+        entry('Late 1st', 10, 5),
+        entry('Late 2nd', 11, 25),
+        entry('Late 3rd', 1, 0),
+        entry()
+
       ]
     }
     this.days = Object.keys(this.bestTimes);
