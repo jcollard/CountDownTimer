@@ -5,6 +5,12 @@
     <source src="assets/no.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
 </audio>
+
+<audio #explosionPlayer>
+    <source src="assets/explosion.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
 <div style="text-align: center;">
     <p>
         End Time: <input type="time" [(ngModel)]="endAt" />
@@ -16,6 +22,10 @@
     </p>
     <p>
         <input type="checkbox" [(ngModel)]="soundEnabled" /> Play Sound
+        <select [(ngModel)]="sound">
+            <option [ngValue]="audioPlayer" selected>Noooooooo!</option>
+            <option [ngValue]="explosionPlayer">Explosion!</option>
+        </select>
     </p>
 
     <table class="calendar">

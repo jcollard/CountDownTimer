@@ -70,8 +70,10 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   title = 'CountDown';
   @ViewChild('timer') el!: ElementRef;
   @ViewChild('audioPlayer') audioPlayerEl!: ElementRef;
+  @ViewChild('explosionPlayer') explosionPlayerEl!: ElementRef;
 
-  private audioPlayer!: HTMLAudioElement;
+  public audioPlayer!: HTMLAudioElement;
+  public explosionPlayer!: HTMLAudioElement;
   private outputArea!: HTMLDivElement;
   private playSound: boolean = false;
   private dayNumToString: Array<string> = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -79,6 +81,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   public readonly days: Array<string>;
   public readonly bestTimes: Record<string, Array<QuickButton>>;
   public soundEnabled: boolean = false;
+  public sound?: HTMLAudioElement;
   public endAt: string = "12:00";
   public timeSet: number = 5;
 
@@ -135,7 +138,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
       ],
 
       '75 Mins': [
-        entry('1st', 9, 5 ),
+        entry('1st', 9, 5),
         entry('2nd', 10, 25),
         entry('3rd', 12, 5),
         entry('Late 1st', 10, 5),
@@ -156,6 +159,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.outputArea = this.el.nativeElement;
     this.audioPlayer = this.audioPlayerEl.nativeElement;
+    this.explosionPlayer = this.explosionPlayerEl.nativeElement;
     setInterval(() => this.updateTime(), 250);
   }
 
@@ -184,7 +188,7 @@ export class CountDownComponent implements OnInit, AfterViewInit {
     this.outputArea.innerHTML = "Times Up!";
     document.title = "Times Up!"
     if (this.playSound && this.soundEnabled) {
-      this.audioPlayer.play();
+      this.sound?.play();
     }
 
     this.playSound = false;
@@ -192,6 +196,10 @@ export class CountDownComponent implements OnInit, AfterViewInit {
 
   private updateTime(): void {
     const remainingMillis = parseTime(this.endAt).getTime() - (new Date().getTime());
+
+    if (this.sound === undefined) {
+      this.sound = this.audioPlayer;
+    }
 
     if (remainingMillis <= 0) {
       this.timesUp();
